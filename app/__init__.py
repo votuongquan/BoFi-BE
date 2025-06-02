@@ -77,7 +77,6 @@ def create_app():
 
 	# Register event handlers
 	try:
-		register_agent_event_handlers()
 		logger = logging.getLogger(__name__)
 		logger.info("Event handlers registered successfully")
 	except Exception as e:

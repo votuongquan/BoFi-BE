@@ -101,28 +101,3 @@ async def get_current_user_profile(current_user_payload: dict = Depends(get_curr
 		message=_('operation_successful'),
 		data=UserResponse.model_validate(user),
 	)
-
-
-@route.put('/me', response_model=APIResponse)
-@handle_exceptions
-async def update_current_user_profile(
-	user_data: dict,
-	current_user_payload: dict = Depends(get_current_user),
-	repo: UserRepo = Depends(),
-):
-	"""
-	Update the profile of the currently authenticated user
-
-	This endpoint allows the authenticated user to update their profile information.
-	"""
-	user_id = current_user_payload.get('user_id')
-	updated_user_data = user_data
-	updated_user = repo.update_user(user_id, updated_user_data)
-	if not updated_user:
-		raise CustomHTTPException(message=_('user_not_found'))
-
-	return APIResponse(
-		error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
-		message=_('operation_successful'),
-		data=UserResponse.model_validate(updated_user),
-	)

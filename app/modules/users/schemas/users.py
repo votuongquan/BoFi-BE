@@ -18,6 +18,13 @@ from app.core.base_model import (
 from app.enums.user_enums import UserRoleEnum
 from app.middleware.translation_manager import _
 
+from app.exceptions.exception import (
+	CustomHTTPException,
+	ForbiddenException,
+	NotFoundException,
+	UnauthorizedException,
+	ValidationException,
+)
 
 class UserResponse(ResponseSchema):
 	"""User info Response model"""
@@ -94,29 +101,6 @@ class SearchUserResponse(APIResponse):
 	"""SearchUserResponse"""
 
 	data: PaginatedResponse[UserResponse] | None
-
-
-class GoogleDirectLoginRequest(BaseModel):
-	"""Request model for direct Google OAuth login (used by mobile apps)"""
-
-	access_token: str
-	id_token: str | None = None
-	refresh_token: str | None = None
-	expires_in: int | None = None
-	token_type: str | None = None
-	scope: str | None = None
-
-
-class GoogleRevokeTokenRequest(BaseModel):
-	"""Request model for revoking Google OAuth token"""
-
-	token: str
-
-
-class GoogleLoginResponse(APIResponse):
-	"""Response model for Google OAuth login"""
-
-	data: UserResponse | None = None
 
 
 class OAuthUserInfo(BaseModel):
