@@ -49,21 +49,20 @@ class AuthenRepo(BaseRepo):
         return self._oauth_service
 
     def login(self, request: LoginRequest):
-        """Handle user login with email and password
+        """Handle user login with username and password
 
-Args:
-    request (LoginRequest): Login request with email and password
+        Args:
+            request (LoginRequest): Login request with username and password
 
-Returns:
-    dict: User info with authentication tokens
+        Returns:
+            dict: User info with authentication tokens
 
-Raises:
-    NotFoundException: If user not found
-    UnauthorizedException: If credentials are invalid
-"""
+        Raises:
+            NotFoundException: If user not found
+            UnauthorizedException: If credentials are invalid
+        """
         try:
-            # Find user by email
-            user = self.user_dal.get_user_by_email(request.email)
+            user = self.user_dal.get_user_by_username(request.username)
             if not user:
                 raise CustomHTTPException(message=_('user_not_found'))
 
@@ -142,37 +141,3 @@ Raises:
             logger.exception(
                 f"Unexpected error during signup for email {user.email}: {ex}")
             raise CustomHTTPException(message=_('signup_failed'))
-
-    # ----- OAuth Methods -----
-    async def refresh_token(self, request: RefreshTokenRequest):
-        """Refresh user access token
-
-        Args:
-            request (RefreshTokenRequest): Request containing refresh token
-
-        Returns:
-            dict: New access token and user information
-        """
-        return await self.get_oauth_service().refresh_token(request)
-
-    async def login_with_google(self, user_info: OAuthUserInfo):
-        """Login or register a user with Google OAuth
-
-        Args:
-            user_info (OAuthUserInfo): Google user information
-
-        Returns:
-            dict: User information with tokens including is_new_user flag
-        """
-        return await self.get_oauth_service().login_with_google(user_info)
-
-    async def log_oauth_token_revocation(self, user_id: str):
-        """Log OAuth token revocation
-
-        Args:
-            user_id (str): The ID of the user revoking access
-
-        Returns:
-            bool: True if successful
-        """
-        return await self.get_oauth_service().log_oauth_token_revocation(user_id)

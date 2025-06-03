@@ -20,7 +20,7 @@ class UserDAL(BaseDAL[User]):
 
 	def get_user_by_email(self, email: str) -> User:
 		"""Tìm user theo email"""
-		return self.db.query(User).filter(User.email == email and User.is_deleted == 0).first()
+		return self.db.query(User).filter(User.email == email).first()
 
 	def get_user_by_google_id(self, google_id: str):
 		"""Get user by Google ID
@@ -46,7 +46,7 @@ class UserDAL(BaseDAL[User]):
 		Returns:
 		    User: User object if found, None otherwise
 		"""
-		return self.db.query(User).filter(and_(User.id == user_id, User.is_deleted == 0)).first()
+		return self.db.query(User).filter(and_(User.id == user_id)).first()
 
 	def get_user_by_username(self, username: str) -> User:
 		"""Get user by username
@@ -57,7 +57,7 @@ class UserDAL(BaseDAL[User]):
 		Returns:
 		    User: User object if found, None otherwise
 		"""
-		return self.db.query(User).filter(and_(User.username == username, User.is_deleted == 0)).first()
+		return self.db.query(User).filter(and_(User.username == username)).first()
 
 	def search_users(self, params: dict) -> Pagination[User]:
 		"""Search users with dynamic filters based on any User model field"""
@@ -68,7 +68,7 @@ class UserDAL(BaseDAL[User]):
 		page_size = int(params.get('page_size', Constants.PAGE_SIZE))
 
 		# Start with basic query
-		query = self.db.query(User).filter(User.is_deleted == 0)
+		query = self.db.query(User)
 
 		# Apply dynamic filters using the common utility function
 		query = apply_dynamic_filters(query, User, params)

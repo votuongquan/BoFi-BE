@@ -82,10 +82,8 @@ class BaseEntity(Base):
 
 	model_config = ConfigDict(arbitrary_types_allowed=True)
  
-	# id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    # make it into auto incrementing integer
 	id = Column(Integer, primary_key=True, autoincrement=True)
-
+ 
 	def __iter__(self):
 		for column in self.__table__.columns:
 			yield column.name, getattr(self, column.name)

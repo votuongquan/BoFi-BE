@@ -57,7 +57,7 @@ class UserResponse(ResponseSchema):
 class LoginRequest(RequestSchema):
     """Login Request model"""
 
-    email: str = Field(..., description=_('email_address'))
+    username: str = Field(..., min_length=3, description='Tên đăng nhập')
     password: str = Field(..., description=_('password'))
  
 class SignupRequest(RequestSchema):
