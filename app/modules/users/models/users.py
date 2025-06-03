@@ -20,7 +20,7 @@ class User(BaseEntity):
 	address = Column(String(255), nullable=True)
 	avatar = Column(String(255), nullable=True)
 	is_active = Column(Boolean, nullable=False, default=True)
-	role = Column(String(50), nullable=False, default=UserRoleEnum.CUSTOMER.value)
+	role = Column(String(50), nullable=False, default="customer")
 
 	@validates('email')
 	def validate_email(self, key, address):

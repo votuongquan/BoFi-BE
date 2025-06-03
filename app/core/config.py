@@ -19,7 +19,7 @@ DB_HOST = os.getenv('DB_HOST', 'localhost')
 # DB_HOST = 'host.docker.internal'
 
 DB_PORT = os.getenv('DB_PORT', '3306')
-DB_NAME = os.getenv('DB_NAME', 'bofitest1')
+DB_NAME = os.getenv('DB_NAME', 'bofitest2')
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{quote(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 SMTP_USERNAME = os.getenv('SMTP_USERNAME')
 SMTP_PASSWORD = os.getenv('SMTP_PASSWORD')

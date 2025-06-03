@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.core.base_model import APIResponse, PagingInfo
 from app.enums.base_enums import BaseErrorCode
-from app.exceptions.exception import CustomHTTPException
+from app.exceptions.exception import CustomHTTPException, NotFoundException
 from app.exceptions.handlers import handle_exceptions
 from app.http.oauth2 import get_current_user
 from app.middleware.auth_middleware import verify_token
@@ -19,83 +19,25 @@ from app.modules.users.schemas.users import (
 
 route = APIRouter(prefix='/users', tags=['Users'], dependencies=[Depends(verify_token)])
 
-
-@route.get('/', response_model=APIResponse)
+@route.get('/{user_id}', response_model=APIResponse)
 @handle_exceptions
-async def search_users(
-	page: int = Query(1, ge=1),
-	page_size: int = Query(10, ge=1),
-	filters_json: str | None = Query(None, description='JSON string of filters'),
+async def get_user_by_id(
+	user_id: int,
 	current_user_payload: dict = Depends(get_current_user),
 	repo: UserRepo = Depends(),
 ):
 	"""
-	Get all users with pagination and dynamic filtering
+	Get user information by ID
 
-	Supports two ways of filtering:
-	1. Using a JSON string of filters with field, operator, and value
-	2. Using direct query parameters for simpler filters (backwards compatibility)
+	Args:
+		user_id: The ID of the user to retrieve
 
-	Example with structured filters:
-	GET /users/?page=1&page_size=10&filters_json=[{"field":"username","operator":"contains","value":"john"}]
-	Available operators:
-	- eq: Equal
-	- ne: Not equal
-	- lt: Less than
-	- lte: Less than or equal
-	- gt: Greater than
-	- gte: Greater than or equal
-	- contains: String contains
-	- startswith: String starts with
-	- endswith: String ends with
-	- in_list: Value is in a list
-	- not_in: Value is not in a list
-	- is_null: Field is null
-	- is_not_null: Field is not null
+	Returns:
+		APIResponse with UserResponse containing user information (id, username, email, full_name, phone, address, is_active, avatar, role)
 	"""
-	filters = []
-	if filters_json:
-		try:
-			filters = json.loads(filters_json)
-			if not isinstance(filters, list):
-				filters = []
-		except json.JSONDecodeError:
-			filters = []
-		except Exception:
-			filters = []
-
-	request = SearchUserRequest(page=page, page_size=page_size, filters=filters)
-	result = repo.search_users(request)
-	return APIResponse(
-		error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
-		message=_('operation_successful'),
-		data=PaginatedResponse[UserResponse](
-			items=[UserResponse.model_validate(user) for user in result.items],
-			paging=PagingInfo(
-				total=result.total_count,
-				total_pages=result.total_pages,
-				page=result.page,
-				page_size=result.page_size,
-			),
-		),
-	)
-
-
-@route.get('/me', response_model=APIResponse)
-@handle_exceptions
-async def get_current_user_profile(current_user_payload: dict = Depends(get_current_user), repo: UserRepo = Depends()):
-	"""
-	Get the profile of the currently authenticated user
-
-	This endpoint returns the full profile information of the authenticated user
-	based on their access token.
-	"""
-	user_id = current_user_payload.get('user_id')
 	user = repo.get_user_by_id(user_id)
-
 	if not user:
-		raise CustomHTTPException(message=_('user_not_found'))
-
+		raise NotFoundException(_('user_not_found'))
 	return APIResponse(
 		error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
 		message=_('operation_successful'),

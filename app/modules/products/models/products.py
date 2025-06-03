@@ -1,4 +1,3 @@
-"""Product model"""
 
 from sqlalchemy import Column, Integer, String, Text, Numeric, SmallInteger
 from sqlalchemy.orm import validates
