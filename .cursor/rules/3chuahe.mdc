@@ -35,7 +35,7 @@ This project modules follows a strict 3-layer architecture:
 
 ### Models (Database Entities)
 - **MUST inherit from `BaseEntity`** from base_model.py
-- Automatically includes: `id` (UUID), `create_date`, `update_date`, `is_deleted`
+- Automatically includes: `id` (int)
 - Provides: `to_dict()`, `dict()`, `items()` methods for serialization
 - Use SQLAlchemy declarative syntax
 
@@ -169,7 +169,6 @@ class UserDAL(BaseDAL[User]):
     def get_user_by_email(self, email: str):
         return self.db.query(self.model).filter(
             self.model.email == email,
-            self.model.is_deleted == False
         ).first()
 ```
 
