@@ -66,6 +66,7 @@
 				<option value="get-current-user">Get Current User Info</option>
 				<option value="get-current-history">Get Current User History</option>
 				<option value="get-current-wishlist">Get Current User Wishlist</option>
+				<option value="add-to-wishlist">Add Product to Wishlist</option>
 				<option value="signup">Signup</option>
 				<option value="login">Login</option>
 				<option value="custom">Custom API URL</option>
@@ -75,6 +76,15 @@
 		<div class="section" id="product-id-section">
 			<label for="product-id">Product ID</label>
 			<input type="text" id="product-id" placeholder="Enter Product ID" />
+		</div>
+
+		<div class="section" id="add-to-wishlist-product-id-section">
+			<label for="add-to-wishlist-product-id">Product ID for Wishlist</label>
+			<input
+				type="text"
+				id="add-to-wishlist-product-id"
+				placeholder="Enter Product ID to add to wishlist"
+			/>
 		</div>
 
 		<div class="section" id="sort-by-section">
@@ -167,6 +177,9 @@
 				const requestType = document.getElementById("request-type").value;
 				document.getElementById("product-id-section").style.display =
 					requestType === "get-product" ? "block" : "none";
+				document.getElementById(
+					"add-to-wishlist-product-id-section"
+				).style.display = requestType === "add-to-wishlist" ? "block" : "none"; // New section for wishlist product ID
 				document.getElementById("sort-by-section").style.display =
 					requestType === "get-all-products" ? "block" : "none";
 				document.getElementById("sort-order-section").style.display =
@@ -192,6 +205,7 @@
 					"get-current-user",
 					"get-current-history",
 					"get-current-wishlist",
+					"add-to-wishlist", // Added for wishlist
 				].includes(requestType)
 					? "block"
 					: "none";
@@ -228,6 +242,8 @@
 					const page = document.getElementById("page-number").value;
 					const pageSize = document.getElementById("page-size").value;
 					url = `${baseUrl}/users/wishlist?page=${page}&page_size=${pageSize}`;
+				} else if (requestType === "add-to-wishlist") {
+					url = `${baseUrl}/users/wishlist`; // URL for adding to wishlist
 				} else if (requestType === "signup") {
 					url = `${baseUrl}/auth/signup`;
 				} else if (requestType === "login") {
@@ -258,6 +274,7 @@
 						"get-current-user",
 						"get-current-history",
 						"get-current-wishlist",
+						"add-to-wishlist", // Added for wishlist
 					].includes(requestType) &&
 					!jwtToken
 				) {
@@ -294,6 +311,18 @@
 						username: document.getElementById("login-username").value,
 						password: document.getElementById("login-password").value,
 					});
+					headers["Content-Type"] = "application/json";
+				} else if (requestType === "add-to-wishlist") {
+					method = "POST";
+					const productId = document.getElementById(
+						"add-to-wishlist-product-id"
+					).value;
+					if (!productId) {
+						document.getElementById("response").textContent =
+							"Product ID is required for adding to wishlist.";
+						return;
+					}
+					body = JSON.stringify(parseInt(productId)); // Send product ID as a number
 					headers["Content-Type"] = "application/json";
 				}
 
@@ -332,6 +361,9 @@
 			document
 				.getElementById("product-id")
 				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("add-to-wishlist-product-id")
+				.addEventListener("input", updateApiUrl); // New event listener
 			document
 				.getElementById("sort-by")
 				.addEventListener("input", updateApiUrl);
