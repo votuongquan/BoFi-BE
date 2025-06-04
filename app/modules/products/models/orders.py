@@ -2,8 +2,6 @@ from sqlalchemy import Column, Integer, Enum, DateTime, Numeric, String
 from sqlalchemy.orm import validates, relationship
 
 from app.core.base_model import BaseEntity
-# from app.enums.order_enums import OrderStatusEnum
-
 
 class Order(BaseEntity):
     """Order model"""

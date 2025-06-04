@@ -1,255 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastAPI Product API Tester</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; margin-left: auto; margin-right: auto; }
-        .section { margin-bottom: 20px; }
-        .section label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 8px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #api-url-preview, #response { background-color: #f8f9fa; padding: 10px; border: 1px solid #ddd; }
-        .copy-button { margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <h1>FastAPI Product API Tester</h1>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>FastAPI Product API Tester</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 20px;
+				max-width: 800px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+			.section {
+				margin-bottom: 20px;
+			}
+			.section label {
+				display: block;
+				margin-bottom: 5px;
+				font-weight: bold;
+			}
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 8px;
+				margin-bottom: 10px;
+			}
+			button {
+				padding: 10px 20px;
+				background-color: #007bff;
+				color: white;
+				border: none;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: #0056b3;
+			}
+			#api-url-preview,
+			#response {
+				background-color: #f8f9fa;
+				padding: 10px;
+				border: 1px solid #ddd;
+			}
+			.copy-button {
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>FastAPI Product API Tester</h1>
 
-    <div class="section">
-        <label for="jwt-token">JWT Token</label>
-        <input type="text" id="jwt-token" placeholder="Enter JWT token">
-    </div>
+		<div class="section">
+			<label for="jwt-token">JWT Token</label>
+			<input type="text" id="jwt-token" placeholder="Enter JWT token" />
+		</div>
 
-    <div class="section">
-        <label for="request-type">Request Type</label>
-        <select id="request-type">
-            <option value="get-product">Get Product by ID</option>
-            <option value="get-all-products">Get All Products (with pagination & sorting)</option>
-            <option value="get-user">Get User by ID</option>
-            <option value="search-history">Search History by UserID</option>
-            <option value="search-wishlist">Search Wishlist by UserID</option>
-            <option value="signup">Signup</option>
-            <option value="login">Login</option>
-            <option value="custom">Custom API URL</option>
-        </select>
-    </div>
+		<div class="section">
+			<label for="request-type">Request Type</label>
+			<select id="request-type">
+				<option value="get-product">Get Product by ID</option>
+				<option value="get-all-products">
+					Get All Products (with pagination & sorting)
+				</option>
+				<option value="get-current-user">Get Current User Info</option>
+				<option value="get-current-history">Get Current User History</option>
+				<option value="get-current-wishlist">Get Current User Wishlist</option>
+				<option value="signup">Signup</option>
+				<option value="login">Login</option>
+				<option value="custom">Custom API URL</option>
+			</select>
+		</div>
 
-    <div class="section" id="product-id-section">
-        <label for="product-id">Product ID</label>
-        <input type="text" id="product-id" placeholder="Enter Product ID">
-    </div>
+		<div class="section" id="product-id-section">
+			<label for="product-id">Product ID</label>
+			<input type="text" id="product-id" placeholder="Enter Product ID" />
+		</div>
 
-    <div class="section" id="sort-by-section">
-        <label for="sort-by">Sort By (optional)</label>
-        <input type="text" id="sort-by" placeholder="Enter sort field (e.g., name)">
-    </div>
+		<div class="section" id="sort-by-section">
+			<label for="sort-by">Sort By (optional)</label>
+			<input
+				type="text"
+				id="sort-by"
+				placeholder="Enter sort field (e.g., name)"
+			/>
+		</div>
 
-    <div class="section" id="sort-order-section">
-        <label for="sort-order">Sort Order</label>
-        <select id="sort-order">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-        </select>
-    </div>
+		<div class="section" id="sort-order-section">
+			<label for="sort-order">Sort Order</label>
+			<select id="sort-order">
+				<option value="asc">Ascending</option>
+				<option value="desc">Descending</option>
+			</select>
+		</div>
 
-    <div class="section" id="page-number-section">
-        <label for="page-number">Page Number</label>
-        <input type="number" id="page-number" value="1" min="1">
-    </div>
+		<div class="section" id="page-number-section">
+			<label for="page-number">Page Number</label>
+			<input type="number" id="page-number" value="1" min="1" />
+		</div>
 
-    <div class="section" id="page-size-section">
-        <label for="page-size">Page Size</label>
-        <input type="number" id="page-size" value="10" min="1">
-    </div>
+		<div class="section" id="page-size-section">
+			<label for="page-size">Page Size</label>
+			<input type="number" id="page-size" value="10" min="1" />
+		</div>
 
-    <div class="section" id="user-id-section">
-        <label for="user-id">User ID</label>
-        <input type="text" id="user-id" placeholder="Enter User ID">
-    </div>
+		<div class="section" id="user-id-section">
+			<label for="user-id">User ID</label>
+			<input type="text" id="user-id" placeholder="Enter User ID" />
+		</div>
 
-    <div class="section" id="language-section">
-        <label for="language">Language</label>
-        <select id="language">
-            <option value="vi">Vietnamese (vi)</option>
-            <option value="en">English (en)</option>
-        </select>
-    </div>
+		<div class="section" id="language-section">
+			<label for="language">Language</label>
+			<select id="language">
+				<option value="vi">Vietnamese (vi)</option>
+				<option value="en">English (en)</option>
+			</select>
+		</div>
 
-    <div class="section" id="signup-section">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter email">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter username">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter password">
-        <label for="full-name">Full Name</label>
-        <input type="text" id="full-name" placeholder="Enter full name">
-        <label for="role">Role</label>
-        <select id="role">
-            <option value="customer">Customer</option>
-            <option value="admin">Admin</option>
-        </select>
-    </div>
+		<div class="section" id="signup-section">
+			<label for="email">Email</label>
+			<input type="email" id="email" placeholder="Enter email" />
+			<label for="username">Username</label>
+			<input type="text" id="username" placeholder="Enter username" />
+			<label for="password">Password</label>
+			<input type="password" id="password" placeholder="Enter password" />
+			<label for="full-name">Full Name</label>
+			<input type="text" id="full-name" placeholder="Enter full name" />
+			<label for="role">Role</label>
+			<select id="role">
+				<option value="customer">Customer</option>
+				<option value="admin">Admin</option>
+			</select>
+		</div>
 
-    <div class="section" id="login-section">
-        <label for="login-username">Username</label>
-        <input type="text" id="login-username" placeholder="Enter username">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" placeholder="Enter password">
-    </div>
+		<div class="section" id="login-section">
+			<label for="login-username">Username</label>
+			<input type="text" id="login-username" placeholder="Enter username" />
+			<label for="login-password">Password</label>
+			<input type="password" id="login-password" placeholder="Enter password" />
+		</div>
 
-    <div class="section" id="custom-url-section">
-        <label for="custom-url">Custom API URL</label>
-        <input type="text" id="custom-url" placeholder="Enter custom API URL">
-    </div>
+		<div class="section" id="custom-url-section">
+			<label for="custom-url">Custom API URL</label>
+			<input type="text" id="custom-url" placeholder="Enter custom API URL" />
+		</div>
 
-    <button onclick="sendRequest()">Send Request</button>
+		<button onclick="sendRequest()">Send Request</button>
 
-    <div class="section">
-        <label>API URL Preview</label>
-        <div id="api-url-preview">No URL generated yet.</div>
-        <button class="copy-button" onclick="copyToCustom()">Copy URL to Custom Input</button>
-    </div>
+		<div class="section">
+			<label>API URL Preview</label>
+			<div id="api-url-preview">No URL generated yet.</div>
+			<button class="copy-button" onclick="copyToCustom()">
+				Copy URL to Custom Input
+			</button>
+		</div>
 
-    <div class="section">
-        <label>Response</label>
-        <pre id="response">No response yet.</pre>
-    </div>
+		<div class="section">
+			<label>Response</label>
+			<pre id="response">No response yet.</pre>
+		</div>
 
-    <script>
-        const baseUrl = 'http://127.0.0.1:8000/api/v1';
+		<script>
+			const baseUrl = "http://127.0.0.1:8000/api/v1";
 
-        function toggleSections() {
-            const requestType = document.getElementById('request-type').value;
-            document.getElementById('product-id-section').style.display = requestType === 'get-product' ? 'block' : 'none';
-            document.getElementById('sort-by-section').style.display = requestType === 'get-all-products' ? 'block' : 'none';
-            document.getElementById('sort-order-section').style.display = requestType === 'get-all-products' ? 'block' : 'none';
-            document.getElementById('page-number-section').style.display = ['get-all-products', 'search-history', 'search-wishlist'].includes(requestType) ? 'block' : 'none';
-            document.getElementById('page-size-section').style.display = ['get-all-products', 'search-history', 'search-wishlist'].includes(requestType) ? 'block' : 'none';
-            document.getElementById('user-id-section').style.display = ['get-user', 'search-history', 'search-wishlist'].includes(requestType) ? 'block' : 'none';
-            document.getElementById('language-section').style.display = ['get-product', 'get-all-products', 'get-user', 'search-history', 'search-wishlist'].includes(requestType) ? 'block' : 'none';
-            document.getElementById('signup-section').style.display = requestType === 'signup' ? 'block' : 'none';
-            document.getElementById('login-section').style.display = requestType === 'login' ? 'block' : 'none';
-            document.getElementById('custom-url-section').style.display = requestType === 'custom' ? 'block' : 'none';
-            updateApiUrl();
-        }
+			function toggleSections() {
+				const requestType = document.getElementById("request-type").value;
+				document.getElementById("product-id-section").style.display =
+					requestType === "get-product" ? "block" : "none";
+				document.getElementById("sort-by-section").style.display =
+					requestType === "get-all-products" ? "block" : "none";
+				document.getElementById("sort-order-section").style.display =
+					requestType === "get-all-products" ? "block" : "none";
+				document.getElementById("page-number-section").style.display = [
+					"get-all-products",
+					"get-current-history",
+					"get-current-wishlist",
+				].includes(requestType)
+					? "block"
+					: "none";
+				document.getElementById("page-size-section").style.display = [
+					"get-all-products",
+					"get-current-history",
+					"get-current-wishlist",
+				].includes(requestType)
+					? "block"
+					: "none";
+				document.getElementById("user-id-section").style.display = "none";
+				document.getElementById("language-section").style.display = [
+					"get-product",
+					"get-all-products",
+					"get-current-user",
+					"get-current-history",
+					"get-current-wishlist",
+				].includes(requestType)
+					? "block"
+					: "none";
+				document.getElementById("signup-section").style.display =
+					requestType === "signup" ? "block" : "none";
+				document.getElementById("login-section").style.display =
+					requestType === "login" ? "block" : "none";
+				document.getElementById("custom-url-section").style.display =
+					requestType === "custom" ? "block" : "none";
+				updateApiUrl();
+			}
 
-        function updateApiUrl() {
-            const requestType = document.getElementById('request-type').value;
-            let url = '';
+			function updateApiUrl() {
+				const requestType = document.getElementById("request-type").value;
+				let url = "";
 
-            if (requestType === 'get-product') {
-                const productId = document.getElementById('product-id').value;
-                url = productId ? `${baseUrl}/products/${productId}` : '';
-            } else if (requestType === 'get-all-products') {
-                const page = document.getElementById('page-number').value;
-                const pageSize = document.getElementById('page-size').value;
-                const sortBy = document.getElementById('sort-by').value;
-                const sortOrder = document.getElementById('sort-order').value;
-                url = `${baseUrl}/products?page=${page}&page_size=${pageSize}`;
-                if (sortBy) url += `&sort_by=${sortBy}&sort_order=${sortOrder}`;
-            } else if (requestType === 'get-user') {
-                const userId = document.getElementById('user-id').value;
-                url = userId ? `${baseUrl}/users/${userId}` : '';
-            } else if (requestType === 'search-history') {
-                const userId = document.getElementById('user-id').value;
-                const page = document.getElementById('page-number').value;
-                const pageSize = document.getElementById('page-size').value;
-                url = userId ? `${baseUrl}/products/history/${userId}?page=${page}&page_size=${pageSize}` : '';
-            } else if (requestType === 'search-wishlist') {
-                const userId = document.getElementById('user-id').value;
-                const page = document.getElementById('page-number').value;
-                const pageSize = document.getElementById('page-size').value;
-                url = userId ? `${baseUrl}/products/wishlist/${userId}?page=${page}&page_size=${pageSize}` : '';
-            } else if (requestType === 'signup') {
-                url = `${baseUrl}/auth/signup`;
-            } else if (requestType === 'login') {
-                url = `${baseUrl}/auth/login`;
-            } else if (requestType === 'custom') {
-                url = document.getElementById('custom-url').value;
-            }
+				if (requestType === "get-product") {
+					const productId = document.getElementById("product-id").value;
+					url = productId ? `${baseUrl}/products/${productId}` : "";
+				} else if (requestType === "get-all-products") {
+					const page = document.getElementById("page-number").value;
+					const pageSize = document.getElementById("page-size").value;
+					const sortBy = document.getElementById("sort-by").value;
+					const sortOrder = document.getElementById("sort-order").value;
+					url = `${baseUrl}/products?page=${page}&page_size=${pageSize}`;
+					if (sortBy) url += `&sort_by=${sortBy}&sort_order=${sortOrder}`;
+				} else if (requestType === "get-current-user") {
+					url = `${baseUrl}/users/info`;
+				} else if (requestType === "get-current-history") {
+					const page = document.getElementById("page-number").value;
+					const pageSize = document.getElementById("page-size").value;
+					url = `${baseUrl}/users/history?page=${page}&page_size=${pageSize}`;
+				} else if (requestType === "get-current-wishlist") {
+					const page = document.getElementById("page-number").value;
+					const pageSize = document.getElementById("page-size").value;
+					url = `${baseUrl}/users/wishlist?page=${page}&page_size=${pageSize}`;
+				} else if (requestType === "signup") {
+					url = `${baseUrl}/auth/signup`;
+				} else if (requestType === "login") {
+					url = `${baseUrl}/auth/login`;
+				} else if (requestType === "custom") {
+					url = document.getElementById("custom-url").value;
+				}
 
-            document.getElementById('api-url-preview').textContent = url || 'No URL generated yet.';
-            return url;
-        }
+				document.getElementById("api-url-preview").textContent =
+					url || "No URL generated yet.";
+				return url;
+			}
 
-        async function sendRequest() {
-            const requestType = document.getElementById('request-type').value;
-            const jwtToken = document.getElementById('jwt-token').value;
-            const language = document.getElementById('language').value;
-            const url = updateApiUrl();
+			async function sendRequest() {
+				const requestType = document.getElementById("request-type").value;
+				const jwtToken = document.getElementById("jwt-token").value;
+				const language = document.getElementById("language").value;
+				const url = updateApiUrl();
 
-            if (!url && requestType !== 'custom') {
-                document.getElementById('response').textContent = 'Please fill in all required fields.';
-                return;
-            }
+				if (!url && requestType !== "custom") {
+					document.getElementById("response").textContent =
+						"Please fill in all required fields.";
+					return;
+				}
 
-            const headers = {
-                'accept': 'application/json',
-                'lang': language
-            };
+				if (
+					[
+						"get-current-user",
+						"get-current-history",
+						"get-current-wishlist",
+					].includes(requestType) &&
+					!jwtToken
+				) {
+					document.getElementById("response").textContent =
+						"JWT token is required for this request.";
+					return;
+				}
 
-            if (jwtToken && requestType !== 'signup' && requestType !== 'login') {
-                headers['Authorization'] = `Bearer ${jwtToken}`;
-            }
+				const headers = {
+					accept: "application/json",
+					lang: language,
+				};
 
-            let method = 'GET';
-            let body = null;
+				if (jwtToken && requestType !== "signup" && requestType !== "login") {
+					headers["Authorization"] = `Bearer ${jwtToken}`;
+				}
 
-            if (requestType === 'signup') {
-                method = 'POST';
-                body = JSON.stringify({
-                    email: document.getElementById('email').value,
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value,
-                    full_name: document.getElementById('full-name').value,
-                    role: document.getElementById('role').value
-                });
-                headers['Content-Type'] = 'application/json';
-            } else if (requestType === 'login') {
-                method = 'POST';
-                body = JSON.stringify({
-                    username: document.getElementById('login-username').value,
-                    password: document.getElementById('login-password').value
-                });
-                headers['Content-Type'] = 'application/json';
-            }
+				let method = "GET";
+				let body = null;
 
-            try {
-                const response = await fetch(url, { method, headers, body });
-                const text = await response.text();
-                try {
-                    const json = JSON.parse(text);
-                    document.getElementById('response').textContent = JSON.stringify(json, null, 2);
-                } catch {
-                    document.getElementById('response').textContent = text;
-                }
-            } catch (error) {
-                document.getElementById('response').textContent = `Error: ${error.message}`;
-            }
-        }
+				if (requestType === "signup") {
+					method = "POST";
+					body = JSON.stringify({
+						email: document.getElementById("email").value,
+						username: document.getElementById("username").value,
+						password: document.getElementById("password").value,
+						full_name: document.getElementById("full-name").value,
+						role: document.getElementById("role").value,
+					});
+					headers["Content-Type"] = "application/json";
+				} else if (requestType === "login") {
+					method = "POST";
+					body = JSON.stringify({
+						username: document.getElementById("login-username").value,
+						password: document.getElementById("login-password").value,
+					});
+					headers["Content-Type"] = "application/json";
+				}
 
-        function copyToCustom() {
-            const url = document.getElementById('api-url-preview').textContent;
-            if (url && url !== 'No URL generated yet.') {
-                document.getElementById('custom-url').value = url;
-                document.getElementById('request-type').value = 'custom';
-                toggleSections();
-            }
-        }
+				try {
+					const response = await fetch(url, { method, headers, body });
+					const text = await response.text();
+					try {
+						const json = JSON.parse(text);
+						document.getElementById("response").textContent = JSON.stringify(
+							json,
+							null,
+							2
+						);
+					} catch {
+						document.getElementById("response").textContent = text;
+					}
+				} catch (error) {
+					document.getElementById(
+						"response"
+					).textContent = `Error: ${error.message}`;
+				}
+			}
 
-        document.getElementById('request-type').addEventListener('input', toggleSections);
-        document.getElementById('product-id').addEventListener('input', updateApiUrl);
-        document.getElementById('sort-by').addEventListener('input', updateApiUrl);
-        document.getElementById('sort-order').addEventListener('change', updateApiUrl);
-        document.getElementById('page-number').addEventListener('input', updateApiUrl);
-        document.getElementById('page-size').addEventListener('input', updateApiUrl);
-        document.getElementById('user-id').addEventListener('input', updateApiUrl);
-        document.getElementById('custom-url').addEventListener('input', updateApiUrl);
-        toggleSections();
-    </script>
-</body>
+			function copyToCustom() {
+				const url = document.getElementById("api-url-preview").textContent;
+				if (url && url !== "No URL generated yet.") {
+					document.getElementById("custom-url").value = url;
+					document.getElementById("request-type").value = "custom";
+					toggleSections();
+				}
+			}
+
+			document
+				.getElementById("request-type")
+				.addEventListener("input", toggleSections);
+			document
+				.getElementById("product-id")
+				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("sort-by")
+				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("sort-order")
+				.addEventListener("change", updateApiUrl);
+			document
+				.getElementById("page-number")
+				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("page-size")
+				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("custom-url")
+				.addEventListener("input", updateApiUrl);
+			toggleSections();
+		</script>
+	</body>
 </html>

@@ -1,6 +1,9 @@
 import json
 
 from fastapi import APIRouter, Depends, Query
+from app.modules.products.repository.product_repo import ProductRepo
+from app.modules.products.schemas.product_request import SearchProductRequest, SortOrder
+from app.modules.products.schemas.product_response import ProductResponse, ShoppingHistoryResponse, ShoppingHistoryItem, WishlistResponse, WishlistItem
 
 from app.core.base_model import APIResponse, PagingInfo
 from app.enums.base_enums import BaseErrorCode
@@ -19,27 +22,77 @@ from app.modules.users.schemas.users import (
 
 route = APIRouter(prefix='/users', tags=['Users'], dependencies=[Depends(verify_token)])
 
-@route.get('/{user_id}', response_model=APIResponse)
+@route.get('/info', response_model=APIResponse)
 @handle_exceptions
-async def get_user_by_id(
-	user_id: int,
-	current_user_payload: dict = Depends(get_current_user),
-	repo: UserRepo = Depends(),
-):
+async def get_current_user_profile(current_user_payload: dict = Depends(get_current_user), repo: UserRepo = Depends()):
 	"""
-	Get user information by ID
+	Get the profile of the currently authenticated user
 
-	Args:
-		user_id: The ID of the user to retrieve
-
-	Returns:
-		APIResponse with UserResponse containing user information (id, username, email, full_name, phone, address, is_active, avatar, role)
+	This endpoint returns the full profile information of the authenticated user
+	based on their access token.
 	"""
+	user_id = current_user_payload.get('user_id')
 	user = repo.get_user_by_id(user_id)
+
 	if not user:
-		raise NotFoundException(_('user_not_found'))
+		raise CustomHTTPException(message=_('user_not_found'))
+
 	return APIResponse(
 		error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
 		message=_('operation_successful'),
 		data=UserResponse.model_validate(user),
 	)
+ 
+@route.get('/history', response_model=APIResponse)
+@handle_exceptions
+async def get_shopping_history(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1),
+    current_user_payload: dict = Depends(get_current_user),
+    repo: ProductRepo = Depends(),
+):
+    """Get shopping history for a user with completed orders"""
+    
+    user_id = current_user_payload.get('user_id')
+    result = repo.get_shopping_history(user_id, page, page_size)
+    return APIResponse(
+        error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
+        message=_('operation_successful'),
+        data=PaginatedResponse[ShoppingHistoryItem](
+            items=[ShoppingHistoryItem.model_validate(
+                item) for item in result.items],
+            paging=PagingInfo(
+                total=result.total_count,
+                total_pages=result.total_pages,
+                page=result.page,
+                page_size=result.page_size,
+            ),
+        ),
+    )
+
+
+@route.get('/wishlist', response_model=APIResponse)
+@handle_exceptions
+async def get_wishlist(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1),
+    current_user_payload: dict = Depends(get_current_user),
+    repo: ProductRepo = Depends(),
+):
+    """Get wishlist for a user"""
+    
+    user_id = current_user_payload.get('user_id')
+    result = repo.get_wishlist(user_id, page, page_size)
+    return APIResponse(
+        error_code=BaseErrorCode.ERROR_CODE_SUCCESS,
+        message=_('operation_successful'),
+        data=PaginatedResponse[WishlistItem](
+            items=[WishlistItem.model_validate(item) for item in result.items],
+            paging=PagingInfo(
+                total=result.total_count,
+                total_pages=result.total_pages,
+                page=result.page,
+                page_size=result.page_size,
+            ),
+        ),
+    )

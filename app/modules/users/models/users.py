@@ -1,7 +1,7 @@
 """User model"""
 
 from sqlalchemy import Boolean, Column, DateTime, Enum, String
-from sqlalchemy.orm import validates, relationship
+from sqlalchemy.orm import validates
 
 from app.core.base_model import BaseEntity
 from app.enums.user_enums import UserRoleEnum
