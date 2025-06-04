@@ -7,9 +7,7 @@ from app.middleware.translation_manager import _
 from app.modules.products.repository.product_repo import ProductRepo
 from app.modules.products.schemas.product_request import SearchProductRequest, SortOrder
 from app.modules.products.schemas.product_response import ProductResponse, ShoppingHistoryResponse, ShoppingHistoryItem, WishlistResponse, WishlistItem
-from app.http.oauth2 import get_current_user
-from app.middleware.auth_middleware import verify_token
-from app.core.base_model import ResponseSchema, APIResponse, PaginatedResponse
+from app.core.base_model import APIResponse, PaginatedResponse
 
 route = APIRouter(prefix='/products',
                   tags=['Products'])
@@ -47,7 +45,7 @@ async def search_products(
         data=PaginatedResponse[ProductResponse](
             items=[ProductResponse.model_validate(
                 product) for product in result.items],
-            pacing=PagingInfo(
+            paging=PagingInfo(
                 total=result.total_count,
                 total_pages=result.total_pages,
                 page=result.page,
@@ -70,5 +68,3 @@ async def get_product_by_id(
         message=_('operation_successful'),
         data=ProductResponse.model_validate(product),
     )
-
-

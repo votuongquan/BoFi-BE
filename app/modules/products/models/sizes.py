@@ -7,7 +7,7 @@ class Size(BaseEntity):
     
     __tablename__ = 'sizes'
     
-    size_name = String(100, nullable=False)
+    size_name = Column(String(50), nullable=False, unique=True)
     
     @validates('size_name')
     def validate_size_name(self, key, size_name):
