@@ -10,7 +10,6 @@ from app.modules.products.models.sizes import Size
 
 logger = logging.getLogger(__name__)
 
-
 class ProductDAL(BaseDAL[Product]):
     """Data Access Layer for Product model"""
 
@@ -50,12 +49,46 @@ class ProductDAL(BaseDAL[Product]):
                 f"Error fetching sizes for product_id {product_id}: {ex}")
             raise
 
+    def get_product_sizes_batch(self, product_ids: list[int]) -> dict[int, list[str]]:
+        """Get size names for multiple product IDs, sorted by XS, S, M, L, XL, XXL"""
+        try:
+            logger.info(f"Fetching sizes for product_ids: {product_ids}")
+            size_data = (
+                self.db.query(Product.id, Size.size_name)
+                .join(SizeProduct, SizeProduct.product_id == Product.id)
+                .join(Size, Size.id == SizeProduct.size_id)
+                .filter(Product.id.in_(product_ids))
+                .all()
+            )
+
+            # Group sizes by product_id
+            size_map = {}
+            for product_id, size_name in size_data:
+                if product_id not in size_map:
+                    size_map[product_id] = []
+                size_map[product_id].append(size_name)
+
+            # Sort sizes according to the predefined order
+            size_order = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+            for product_id in size_map:
+                size_map[product_id] = sorted(
+                    size_map[product_id],
+                    key=lambda x: size_order.index(x) if x in size_order else len(size_order)
+                )
+
+            logger.info(f"Found sizes for {len(size_map)} products")
+            return size_map
+        except Exception as ex:
+            logger.exception(f"Error fetching sizes for product_ids {product_ids}: {ex}")
+            raise
+
     def search_products(self, params: dict) -> Pagination[Product]:
         """Search products with pagination, filtering, and sorting"""
         logger.info(f'Searching products with parameters: {params}')
         page = int(params.get('page', 1))
         page_size = int(params.get('page_size', Constants.PAGE_SIZE))
-        price = params.get('price')
+        item_type = params.get('item_type')
+        size_type = params.get('size_type')
         sort_by = params.get('sort_by')
         sort_order = params.get('sort_order', 'asc')
 
@@ -63,8 +96,17 @@ class ProductDAL(BaseDAL[Product]):
         query = self.db.query(Product)
 
         # Apply filters
-        if price is not None:
-            query = query.filter(Product.price == price)
+        if item_type is not None:
+            logger.info(f"Filtering products by item_type: {item_type}")
+            query = query.filter(Product.category_id == item_type)
+
+        if size_type is not None:
+            logger.info(f"Filtering products by size_type: {size_type}")
+            query = (
+                query.join(SizeProduct, Product.id == SizeProduct.product_id)
+                     .join(Size, Size.id == SizeProduct.size_id)
+                     .filter(Size.size_name == size_type)
+            )
 
         # Apply sorting
         if sort_by and hasattr(Product, sort_by):

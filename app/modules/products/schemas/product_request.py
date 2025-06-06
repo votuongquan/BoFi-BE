@@ -13,6 +13,7 @@ class SearchProductRequest(RequestSchema):
 
     page: int = 1
     page_size: int = 10
-    price: Optional[float] = None
+    item_type: Optional[int] = None
+    size_type: Optional[str] = None  # New field for size filter
     sort_by: Optional[str] = None
     sort_order: Optional[SortOrder] = SortOrder.ASC

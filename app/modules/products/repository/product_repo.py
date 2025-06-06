@@ -11,6 +11,7 @@ from app.modules.products.schemas.product_request import SearchProductRequest
 from app.modules.products.models.products import Product
 from app.modules.products.models.orders import Order
 from app.modules.products.models.wishlists import Wishlist
+from app.modules.products.schemas.product_response import ProductResponse
 from sqlalchemy import and_
 
 logger = logging.getLogger(__name__)
@@ -22,17 +23,48 @@ class ProductRepo(BaseRepo):
         self.db = db
         self.product_dal = ProductDAL(db)
 
-    def get_product_by_id(self, product_id: int) -> Product:
+    # File: product_repo.py
+
+    def get_product_by_id(self, product_id: int):  # Change return type to ProductResponse
         """Retrieve a product by its ID"""
         product = self.product_dal.get_product_by_id(product_id)
         if not product:
             raise NotFoundException(_('product_not_found'))
-        return product
+        
+        # Fetch sizes for the product
+        sizes = self.product_dal.get_product_sizes(product_id)
+        
+        # Convert product to ProductResponse and include sizes
+        product_response = ProductResponse.model_validate(product)
+        product_response.size = sizes  # Assign sizes to the response
+        return product_response
 
-    def search_products(self, request: SearchProductRequest) -> Pagination[Product]:
+    # File: product_repo.py
+
+    def search_products(self, request: SearchProductRequest) -> Pagination[ProductResponse]:
         """Search products with pagination, filtering, and sorting"""
         try:
-            return self.product_dal.search_products(request.model_dump())
+            # Get the paginated products from ProductDAL
+            result = self.product_dal.search_products(request.model_dump())
+            
+            # Fetch sizes for all products in one query
+            product_ids = [product.id for product in result.items]
+            size_map = self.product_dal.get_product_sizes_batch(product_ids)
+            
+            # Create ProductResponse objects
+            product_responses = []
+            for product in result.items:
+                product_response = ProductResponse.model_validate(product)
+                product_response.size = size_map.get(product.id, [])
+                product_responses.append(product_response)
+            
+            # Return updated Pagination
+            return Pagination(
+                items=product_responses,
+                total_count=result.total_count,
+                page=result.page,
+                page_size=result.page_size
+            )
         except Exception as ex:
             logger.exception(f"Error searching products: {ex}")
             raise
