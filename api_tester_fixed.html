@@ -60,8 +60,8 @@
 			<label for="request-type">Request Type</label>
 			<select id="request-type">
 				<option value="get-product">Get Product by ID</option>
-				<option value="get-all-products">
-					Get All Products (with pagination & sorting)
+				<option value="search-products">
+					Search Products (with size filter)
 				</option>
 				<option value="get-current-user">Get Current User Info</option>
 				<option value="get-current-history">Get Current User History</option>
@@ -87,13 +87,41 @@
 			/>
 		</div>
 
+		<div class="section" id="size-type-section">
+			<label for="size-type">Size Type</label>
+			<select id="size-type">
+				<option value="">All Sizes</option>
+				<option value="XXS">XXS</option>
+				<option value="XS">XS</option>
+				<option value="S">S</option>
+				<option value="M">M</option>
+				<option value="L">L</option>
+				<option value="XL">XL</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="26">26</option>
+				<option value="28">28</option>
+				<option value="30">30</option>
+				<option value="32">32</option>
+				<option value="34">34</option>
+				<option value="35">35</option>
+				<option value="36">36</option>
+			</select>
+		</div>
+
 		<div class="section" id="sort-by-section">
 			<label for="sort-by">Sort By (optional)</label>
-			<input
-				type="text"
-				id="sort-by"
-				placeholder="Enter sort field (e.g., name)"
-			/>
+			<select id="sort-by">
+				<option value="">No sorting</option>
+				<option value="name">Name</option>
+				<option value="price">Price</option>
+				<option value="created_at">Created Date</option>
+				<option value="updated_at">Updated Date</option>
+			</select>
 		</div>
 
 		<div class="section" id="sort-order-section">
@@ -179,20 +207,22 @@
 					requestType === "get-product" ? "block" : "none";
 				document.getElementById(
 					"add-to-wishlist-product-id-section"
-				).style.display = requestType === "add-to-wishlist" ? "block" : "none"; // New section for wishlist product ID
+				).style.display = requestType === "add-to-wishlist" ? "block" : "none";
+				document.getElementById("size-type-section").style.display =
+					requestType === "search-products" ? "block" : "none";
 				document.getElementById("sort-by-section").style.display =
-					requestType === "get-all-products" ? "block" : "none";
+					requestType === "search-products" ? "block" : "none";
 				document.getElementById("sort-order-section").style.display =
-					requestType === "get-all-products" ? "block" : "none";
+					requestType === "search-products" ? "block" : "none";
 				document.getElementById("page-number-section").style.display = [
-					"get-all-products",
+					"search-products",
 					"get-current-history",
 					"get-current-wishlist",
 				].includes(requestType)
 					? "block"
 					: "none";
 				document.getElementById("page-size-section").style.display = [
-					"get-all-products",
+					"search-products",
 					"get-current-history",
 					"get-current-wishlist",
 				].includes(requestType)
@@ -201,11 +231,11 @@
 				document.getElementById("user-id-section").style.display = "none";
 				document.getElementById("language-section").style.display = [
 					"get-product",
-					"get-all-products",
+					"search-products",
 					"get-current-user",
 					"get-current-history",
 					"get-current-wishlist",
-					"add-to-wishlist", // Added for wishlist
+					"add-to-wishlist",
 				].includes(requestType)
 					? "block"
 					: "none";
@@ -225,12 +255,14 @@
 				if (requestType === "get-product") {
 					const productId = document.getElementById("product-id").value;
 					url = productId ? `${baseUrl}/products/${productId}` : "";
-				} else if (requestType === "get-all-products") {
+				} else if (requestType === "search-products") {
 					const page = document.getElementById("page-number").value;
 					const pageSize = document.getElementById("page-size").value;
+					const sizeType = document.getElementById("size-type").value;
 					const sortBy = document.getElementById("sort-by").value;
 					const sortOrder = document.getElementById("sort-order").value;
-					url = `${baseUrl}/products?page=${page}&page_size=${pageSize}`;
+					url = `${baseUrl}/products/?page=${page}&page_size=${pageSize}`;
+					if (sizeType) url += `&size_type=${sizeType}`;
 					if (sortBy) url += `&sort_by=${sortBy}&sort_order=${sortOrder}`;
 				} else if (requestType === "get-current-user") {
 					url = `${baseUrl}/users/info`;
@@ -243,7 +275,7 @@
 					const pageSize = document.getElementById("page-size").value;
 					url = `${baseUrl}/users/wishlist?page=${page}&page_size=${pageSize}`;
 				} else if (requestType === "add-to-wishlist") {
-					url = `${baseUrl}/users/wishlist`; // URL for adding to wishlist
+					url = `${baseUrl}/users/wishlist`;
 				} else if (requestType === "signup") {
 					url = `${baseUrl}/auth/signup`;
 				} else if (requestType === "login") {
@@ -274,7 +306,7 @@
 						"get-current-user",
 						"get-current-history",
 						"get-current-wishlist",
-						"add-to-wishlist", // Added for wishlist
+						"add-to-wishlist",
 					].includes(requestType) &&
 					!jwtToken
 				) {
@@ -322,7 +354,7 @@
 							"Product ID is required for adding to wishlist.";
 						return;
 					}
-					body = JSON.stringify(parseInt(productId)); // Send product ID as a number
+					body = JSON.stringify(parseInt(productId));
 					headers["Content-Type"] = "application/json";
 				}
 
@@ -363,10 +395,13 @@
 				.addEventListener("input", updateApiUrl);
 			document
 				.getElementById("add-to-wishlist-product-id")
-				.addEventListener("input", updateApiUrl); // New event listener
+				.addEventListener("input", updateApiUrl);
+			document
+				.getElementById("size-type")
+				.addEventListener("change", updateApiUrl);
 			document
 				.getElementById("sort-by")
-				.addEventListener("input", updateApiUrl);
+				.addEventListener("change", updateApiUrl);
 			document
 				.getElementById("sort-order")
 				.addEventListener("change", updateApiUrl);
@@ -383,3 +418,4 @@
 		</script>
 	</body>
 </html>
+-

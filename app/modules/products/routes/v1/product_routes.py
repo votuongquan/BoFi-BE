@@ -12,6 +12,7 @@ from app.core.base_model import APIResponse, PaginatedResponse
 route = APIRouter(prefix='/products',
                   tags=['Products'])
 
+
 @route.get('/', response_model=APIResponse)
 @handle_exceptions
 async def search_products(
@@ -54,6 +55,7 @@ async def search_products(
             ),
         ),
     )
+
 
 @route.get('/{product_id}', response_model=APIResponse)
 @handle_exceptions

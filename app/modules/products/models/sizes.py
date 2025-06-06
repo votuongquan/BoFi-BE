@@ -15,6 +15,7 @@ class Size(BaseEntity):
             raise ValueError('Size name must be at least 1 character long')
         return size_name
 
+
     def to_dict(self):
         """Convert model to dictionary"""
         result = super().to_dict()
